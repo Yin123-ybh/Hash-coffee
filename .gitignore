@@ -1,13 +1,14 @@
-# Mac 系统文件
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+*.swp
+*.swo
+*~
 .DS_Store
-
-# IDEA 配置
 .idea/
 *.iml
-
-# Maven/Gradle 编译目录
-target/
-
-# Spring Boot 本地配置
 application-dev.yml
-application-test.yml
