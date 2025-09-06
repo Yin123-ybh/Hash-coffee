@@ -7,7 +7,7 @@ application-test.yml
 *.iml
 
 # 编译输出
-target/
+sky-server/target/
 
 # 日志文件
 *.log
