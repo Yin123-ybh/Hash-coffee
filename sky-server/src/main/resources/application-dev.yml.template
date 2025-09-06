@@ -1,0 +1,23 @@
+sky:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: pet-cafe-shop
+    username: root
+    password: your_database_password
+  alioss:
+    endpoint: your_alioss_endpoint
+    access-key-id: your_alioss_access_key_id
+    access-key-secret: your_alioss_access_key_secret
+    bucket-name: your_alioss_bucket_name
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 5
+    password: your_redis_password
+  wechat:
+    appid: your_wechat_appid
+    secret: your_wechat_secret
+    notify-url: your_wechat_notify_url
+    refund-notify-url: your_wechat_refund_notify_url
