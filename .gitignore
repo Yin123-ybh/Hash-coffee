@@ -1,13 +1,13 @@
-# 忽略开发环境配置文件（避免提交密钥）
-application-dev.yml
-application-test.yml
+# Mac 系统文件
+.DS_Store
 
-# IDEA 自动生成的文件
+# IDEA 配置
 .idea/
 *.iml
 
-# 编译输出
-sky-server/target/
+# Maven/Gradle 编译目录
+target/
 
-# 日志文件
-*.log
+# Spring Boot 本地配置
+application-dev.yml
+application-test.yml
