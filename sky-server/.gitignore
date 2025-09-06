@@ -1,0 +1,13 @@
+# 忽略开发环境配置文件（避免提交密钥）
+application-dev.yml
+application-test.yml
+
+# IDEA 自动生成的文件
+.idea/
+*.iml
+
+# 编译输出
+target/
+
+# 日志文件
+*.log
