@@ -63,7 +63,7 @@ sky:
   shop:
     address: 燕山大学
   baidu:
-    ak: wY6ENItmnt6JRo2vkzCPWTONHBySI4AO
+    ak: ${BAIDU_API_KEY:your-baidu-api-key}
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}
