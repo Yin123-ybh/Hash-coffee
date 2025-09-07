@@ -1,0 +1,23 @@
+sky:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: pet-cafe-shop
+    username: root
+    password: ${DB_PASSWORD:your-db-password}
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: ${ALIYUN_ACCESS_KEY_ID:your-access-key-id}
+    access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:your-access-key-secret}
+    bucket-name: pet-coffee-shop
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 5
+    password: ${REDIS_PASSWORD:your-redis-password}
+  wechat:
+    appid: ${WECHAT_APPID:your-wechat-appid}
+    secret: ${WECHAT_SECRET:your-wechat-secret}
+    notify-url: ${WECHAT_NOTIFY_URL:http://your-domain.com/notify/paySuccess}
+    refund-notify-url: ${WECHAT_REFUND_NOTIFY_URL:http://your-domain.com/refund/notify/refundSuccess}
