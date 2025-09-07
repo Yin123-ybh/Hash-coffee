@@ -44,6 +44,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     public void update(CouponTemplateDTO couponTemplateDTO) {
         CouponTemplate couponTemplate = new CouponTemplate();
         BeanUtils.copyProperties(couponTemplateDTO, couponTemplate);
+        couponTemplate.setUpdateTime(LocalDateTime.now());
         couponTemplateMapper.update(couponTemplate);
     }
 

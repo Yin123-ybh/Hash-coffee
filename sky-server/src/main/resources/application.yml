@@ -6,24 +6,29 @@ spring:
     active: dev
   main:
     allow-circular-references: true
-
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
-
   datasource:
     druid:
       driver-class-name: ${sky.datasource.driver-class-name}
       url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: ${sky.datasource.username}
       password: ${sky.datasource.password}
-
   redis:
     host: ${sky.redis.host}
     port: ${sky.redis.port}
     database: ${sky.redis.database}
     password: ${sky.redis.password}
+
+# 添加在这里 - 与 spring 同级
+springfox:
+  documentation:
+    auto-startup: false
 
 mybatis:
   #mapper配置文件
@@ -55,22 +60,15 @@ sky:
     user-secret-key: itcast
     # 设置用户令牌过期时间
     user-ttl: 7200000
-
   shop:
     address: 燕山大学
   baidu:
     ak: wY6ENItmnt6JRo2vkzCPWTONHBySI4AO
-
-
-
-
-
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}
     access-key-secret: ${sky.alioss.access-key-secret}
     bucket-name: ${sky.alioss.bucket-name}
-
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
