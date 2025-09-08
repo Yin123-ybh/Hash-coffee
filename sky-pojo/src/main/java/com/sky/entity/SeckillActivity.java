@@ -99,4 +99,9 @@ public class SeckillActivity implements Serializable {
      * 修改人
      */
     private Long updateUser;
+
+    /**
+     * 咖啡名称
+     */
+    private String dishName;
 }
