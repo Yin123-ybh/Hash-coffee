@@ -1,0 +1,140 @@
+@font-face {
+  font-family: 'iconfont';  /* Project id 3388893 */
+  src: url('//at.alicdn.com/t/font_3388893_e5ffotpqbv7.woff2?t=1654065128569') format('woff2'),
+       url('//at.alicdn.com/t/font_3388893_e5ffotpqbv7.woff?t=1654065128569') format('woff'),
+       url('//at.alicdn.com/t/font_3388893_e5ffotpqbv7.ttf?t=1654065128569') format('truetype');
+}
+
+/* 咖啡图标库 */
+@font-face {
+  font-family: "iconfont"; /* Project id 5013278 */
+  src: url('//at.alicdn.com/t/c/font_5013278_nul3gtfqvuf.woff2?t=1756963692131') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5013278_nul3gtfqvuf.woff?t=1756963692131') format('woff'),
+       url('//at.alicdn.com/t/c/font_5013278_nul3gtfqvuf.ttf?t=1756963692131') format('truetype');
+}
+
+/* 优惠券图标库 */
+@font-face {
+  font-family: "iconfont"; /* Project id 5013927 */
+  src: url('//at.alicdn.com/t/c/font_5013927_e7441h8p5z.woff2?t=1756969074801') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5013927_e7441h8p5z.woff?t=1756969074801') format('woff'),
+       url('//at.alicdn.com/t/c/font_5013927_e7441h8p5z.ttf?t=1756969074801') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.dashboard:before {
+  content: "\e605";
+}
+.icon-category:before {
+  content: "\e60c";
+}
+
+.icon-employee:before {
+  content: "\e60b";
+}
+
+.icon-user:before {
+  content: "\e610";
+}
+
+.icon-order:before {
+  content: "\e607";
+}
+
+.icon-combo:before {
+  content: "\e609";
+}
+
+.icon-lock:before {
+  content: "\e60f";
+}
+
+.icon-dish:before {
+  content: "\e60a";
+}
+.icon-inform:before {
+  content: "\e60d";
+}
+.icon-statistics:before {
+  content: "\e608";
+}
+.icon-clear:before {
+  content: "\e611";
+}
+.icon-download:before {
+  content: "\e613";
+}
+.icon-open:before {
+  content: "\e614";
+}
+.icon-stop:before {
+  content: "\e615";
+}
+.icon-waiting:before {
+  content: "\e61a";
+}
+
+.icon-staySway:before {
+  content: "\e616";
+}
+
+.icon-all:before {
+  content: "\e617";
+}
+
+.icon-cancel:before {
+  content: "\e618";
+}
+
+.icon-complete:before {
+  content: "\e619";
+}
+
+/* 咖啡图标样式 */
+.icon-coffee:before {
+  content: "\e826";
+}
+
+/* 优惠券相关图标 - 新字体库 */
+.icon-huodong:before {
+  content: "\e679";
+}
+
+.icon-quan:before {
+  content: "\e600";
+}
+
+.icon-tongji:before {
+  content: "\e608";
+}
+
+/* 优惠券相关图标别名 */
+.icon-coupon:before {
+  content: "\e600";
+}
+
+.icon-coupon-template:before {
+  content: "\e600";
+}
+
+.icon-seckill:before {
+  content: "\e679";
+}
+
+.icon-seckill-activity:before {
+  content: "\e679";
+}
+
+.icon-coupon-statistics:before {
+  content: "\e608";
+}
+
+.icon-coupon-stats:before {
+  content: "\e608";
+}

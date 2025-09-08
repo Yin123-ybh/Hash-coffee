@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="favicon.ico?v=3" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.ico?v=3" type="image/x-icon" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/icons/favicon-32x32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/icons/favicon-16x16.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/icons/apple-touch-icon.png?v=3">
+    <title>Hash咖啡</title>
+    <style>
+      /* 强制设置顶部导航栏为咖啡色 - 最高优先级 */
+      .navbar, .navbar-blue, div.navbar, [class*="navbar"] {
+        background: #8B4513 !important;
+        background-color: #8B4513 !important;
+        background-image: none !important;
+      }
+      
+      /* 使用更具体的选择器 */
+      html body .navbar, html body .navbar-blue, html body div.navbar,
+      #app .navbar, #app .navbar-blue, #app div.navbar,
+      .app-wrapper .navbar, .app-wrapper .navbar-blue, .app-wrapper div.navbar {
+        background: #8B4513 !important;
+        background-color: #8B4513 !important;
+        background-image: none !important;
+      }
+      
+      /* 使用属性选择器 */
+      [class*="navbar"] {
+        background: #8B4513 !important;
+        background-color: #8B4513 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <strong
+        >We're sorry but <%= webpackConfig.name %> doesn't work properly without
+        JavaScript enabled. Please enable it to continue.</strong
+      >
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <!-- <% if (process.env.VUE_APP_NODE_ENV === 'prod' ) { %>
+      <script type="text/javascript" src="https://pip-data-rollback.itheima.net/init.min.js" async="async" id="data-rollback" exchange="maintainExchange"></script>
+    <% } %> -->
+  </body>
+</html>

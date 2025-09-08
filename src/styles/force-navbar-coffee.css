@@ -1,0 +1,75 @@
+/* 强制顶部导航栏咖啡色覆盖样式 - 最高优先级 */
+
+/* 基础选择器 */
+.navbar, .navbar-blue, .navbar-coffee, div.navbar, [class*="navbar"] {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+  background-image: none !important;
+  background-attachment: scroll !important;
+  background-clip: border-box !important;
+  background-origin: padding-box !important;
+  background-position: 0% 0% !important;
+  background-repeat: repeat !important;
+  background-size: auto !important;
+}
+
+/* 使用最高优先级的选择器 */
+html body #app .app-wrapper .main-container .navbar,
+html body #app .app-wrapper .main-container .navbar.navbar-blue,
+html body #app .app-wrapper .main-container .navbar.navbar-coffee,
+html body #app .app-wrapper .main-container div.navbar,
+html body #app .app-wrapper .main-container [class*="navbar"] {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+  background-image: none !important;
+  background-attachment: scroll !important;
+  background-clip: border-box !important;
+  background-origin: padding-box !important;
+  background-position: 0% 0% !important;
+  background-repeat: repeat !important;
+  background-size: auto !important;
+}
+
+/* 使用属性选择器 */
+[class*="navbar"][style*="background"] {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
+
+/* 使用data属性选择器 */
+[data-bg-color] {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
+
+/* 使用ID选择器 */
+#navbar, #navbar-coffee, #navbar-blue {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
+
+/* 使用伪类选择器 */
+.navbar:hover, .navbar:focus, .navbar:active {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
+
+/* 使用子选择器 */
+body > div > div > .navbar,
+body > div > div > .navbar.navbar-blue,
+body > div > div > .navbar.navbar-coffee {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
+
+/* 使用相邻选择器 */
+div + .navbar, .navbar + div {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
+
+/* 使用通用选择器 */
+* .navbar, * .navbar-blue, * .navbar-coffee {
+  background: #8B4513 !important;
+  background-color: #8B4513 !important;
+}
