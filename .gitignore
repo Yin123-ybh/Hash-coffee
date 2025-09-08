@@ -1,3 +1,4 @@
+# Frontend
 .DS_Store
 node_modules
 /dist
@@ -24,3 +25,17 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+# Backend
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+*.iml
+application-dev.yml
