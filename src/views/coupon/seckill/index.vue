@@ -219,7 +219,7 @@
             v-model="temp.startTime"
             type="datetime"
             placeholder="选择开始时间"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-ddTHH:mm:ss"
             style="width: 100%;"
           />
         </el-form-item>
@@ -228,7 +228,7 @@
             v-model="temp.endTime"
             type="datetime"
             placeholder="选择结束时间"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-ddTHH:mm:ss"
             style="width: 100%;"
           />
         </el-form-item>
@@ -299,7 +299,8 @@
 </template>
 
 <script>
-import { seckillApi, dishApi } from '@/api/coupon'
+import { seckillApi } from '@/api/coupon'
+import { queryDishList } from '@/api/dish'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -374,7 +375,7 @@ export default {
     },
     async getProductList() {
       try {
-        const response = await dishApi.getList({ status: 1 })
+        const response = await queryDishList({ status: 1 })
         if (response.data.code === 1) {
           this.productList = response.data.data
         }
