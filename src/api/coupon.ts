@@ -115,9 +115,9 @@ export const seckillApi = {
     }),
   
   // 修改秒杀活动
-  update: (data: any) =>
+  update: (id: number, data: any) =>
     request({
-      url: '/api/seckill',
+      url: `/api/seckill`,
       method: 'put',
       data
     }),
