@@ -19,5 +19,8 @@
             </if>
         </where>
     </select>
+    <select id="getAllUserIds" resultType="java.lang.Long">
+        SELECT id FROM user ORDER BY id
+    </select>
 
 </mapper>

@@ -7,6 +7,7 @@ import com.sky.entity.Coupon;
 import com.sky.entity.CouponTemplate;
 import com.sky.mapper.CouponMapper;
 import com.sky.mapper.CouponTemplateMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.CouponService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class CouponServiceImpl implements CouponService {
 
     @Autowired
     private CouponTemplateMapper couponTemplateMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public Page<Coupon> pageQuery(CouponPageQueryDTO couponPageQueryDTO) {
@@ -36,57 +39,110 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public void batchIssue(CouponBatchIssueDTO couponBatchIssueDTO) {
+        // 添加方法开始日志
+        log.info("=== 开始批量发放优惠券 ===");
+        log.info("请求参数: templateId={}, userIds={}, count={}",
+                couponBatchIssueDTO.getTemplateId(),
+                couponBatchIssueDTO.getUserIds(),
+                couponBatchIssueDTO.getCount());
+
         CouponTemplate template = couponTemplateMapper.getById(couponBatchIssueDTO.getTemplateId());
         if (template == null) {
+            log.error("优惠券模板不存在: templateId={}", couponBatchIssueDTO.getTemplateId());
             throw new RuntimeException("优惠券模板不存在");
         }
+        log.info("找到优惠券模板: id={}, name={}", template.getId(), template.getName());
 
         List<Coupon> coupons = new ArrayList<>();
         List<Long> userIds = couponBatchIssueDTO.getUserIds();
 
         // 如果指定了用户ID列表，则只给指定用户发放
         if (userIds != null && !userIds.isEmpty()) {
+            log.info("指定用户发放模式，用户数量: {}", userIds.size());
             for (Long userId : userIds) {
                 // 检查用户是否已领取过该模板的优惠券
                 if (hasReceived(userId, template.getId())) {
+                    log.info("用户 {} 已领取过该模板优惠券，跳过", userId);
                     continue;
                 }
-                
+
+                log.info("为用户 {} 生成 {} 张优惠券", userId, couponBatchIssueDTO.getCount());
                 for (int i = 0; i < couponBatchIssueDTO.getCount(); i++) {
+                    String code = generateCouponCode();
                     Coupon coupon = Coupon.builder()
                             .templateId(template.getId())
                             .userId(userId)
-                            .code(generateCouponCode())
+                            .code(code)
                             .status(0)
                             .createTime(LocalDateTime.now())
                             .updateTime(LocalDateTime.now())
                             .build();
                     coupons.add(coupon);
+                    log.debug("生成优惠券: userId={}, code={}", userId, code);
                 }
             }
         } else {
-            // 给所有用户发放（这里简化处理，实际应该查询所有用户）
-            // 为了演示，这里只给前100个用户发放
-            for (int i = 1; i <= 100; i++) {
-                for (int j = 0; j < couponBatchIssueDTO.getCount(); j++) {
-                    Coupon coupon = Coupon.builder()
-                            .templateId(template.getId())
-                            .userId((long) i)
-                            .code(generateCouponCode())
-                            .status(0)
-                            .createTime(LocalDateTime.now())
-                            .updateTime(LocalDateTime.now())
-                            .build();
-                    coupons.add(coupon);
-                }
-            }
+        // 所有用户发放模式
+        log.info("所有用户发放模式，将给所有存在的用户发放");
+
+        // 查询所有存在的用户ID
+        List<Long> allUserIds = userMapper.getAllUserIds();
+        if (allUserIds.isEmpty()) {
+            log.warn("没有找到任何用户");
+            return;
         }
 
-        if (!coupons.isEmpty()) {
-            couponMapper.insertBatch(coupons);
+        log.info("找到 {} 个用户，将给每个用户发放 {} 张优惠券", allUserIds.size(), couponBatchIssueDTO.getCount());
+
+        for (Long userId : allUserIds) {
+            // 检查用户是否已领取过该模板的优惠券
+            if (hasReceived(userId, template.getId())) {
+                log.info("用户 {} 已领取过该模板优惠券，跳过", userId);
+                continue;
+            }
+
+            log.info("为用户 {} 生成 {} 张优惠券", userId, couponBatchIssueDTO.getCount());
+            for (int i = 0; i < couponBatchIssueDTO.getCount(); i++) {
+                String code = generateCouponCode();
+                Coupon coupon = Coupon.builder()
+                        .templateId(template.getId())
+                        .userId(userId)
+                        .code(code)
+                        .status(0)
+                        .createTime(LocalDateTime.now())
+                        .updateTime(LocalDateTime.now())
+                        .build();
+                coupons.add(coupon);
+                log.debug("生成优惠券: userId={}, code={}", userId, code);
+            }
         }
     }
 
+        log.info("总共生成 {} 条优惠券记录", coupons.size());
+
+        if (!coupons.isEmpty()) {
+            try {
+                log.info("开始执行批量插入操作...");
+                int insertedCount = couponMapper.insertBatch(coupons);
+                log.info("批量插入完成，实际插入 {} 条记录", insertedCount);
+
+                // 验证插入结果
+                if (insertedCount != coupons.size()) {
+                    log.error("插入记录数不匹配！预期: {}, 实际: {}", coupons.size(), insertedCount);
+                    throw new RuntimeException("优惠券发放失败，预期插入 " + coupons.size() + " 条，实际插入 " + insertedCount + " 条");
+                } else {
+                    log.info("优惠券发放成功！");
+                }
+            } catch (Exception e) {
+                log.error("批量插入优惠券时发生异常", e);
+                throw e;
+            }
+        } else {
+            log.warn("没有生成任何优惠券记录");
+        }
+
+        log.info("=== 批量发放优惠券完成 ===");
+    }
     @Override
     public List<Coupon> getByUserId(Long userId, Integer status) {
         return couponMapper.getByUserId(userId, status);

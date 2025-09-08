@@ -4,19 +4,26 @@
 <mapper namespace="com.sky.mapper.CouponTemplateMapper">
 
     <select id="pageQuery" resultType="com.sky.entity.CouponTemplate">
-        select * from coupon_template
+        select ct.*,
+        COALESCE(coupon_count.used_count, 0) as usedCount
+        from coupon_template ct
+        left join (
+        select template_id, COUNT(*) as used_count
+        from coupon
+        group by template_id
+        ) coupon_count on ct.id = coupon_count.template_id
         <where>
             <if test="name != null and name != ''">
-                and name like concat('%',#{name},'%')
+                and ct.name like concat('%',#{name},'%')
             </if>
             <if test="type != null">
-                and type = #{type}
+                and ct.type = #{type}
             </if>
             <if test="status != null">
-                and status = #{status}
+                and ct.status = #{status}
             </if>
         </where>
-        order by create_time desc
+        order by ct.create_time desc
     </select>
 
     <select id="getById" resultType="com.sky.entity.CouponTemplate">

@@ -20,7 +20,7 @@ public interface CouponMapper {
     /**
      * 批量插入优惠券
      */
-    void insertBatch(@Param("coupons") List<Coupon> coupons);
+    int insertBatch(@Param("coupons") List<Coupon> coupons);
 
     /**
      * 根据用户ID查询优惠券
