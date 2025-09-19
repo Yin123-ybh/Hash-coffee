@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.SeckillParticipantMapper">
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into seckill_participant (activity_id, user_id,quantity,status, create_time,update_time)
+        values (#{activityId}, #{userId}, #{quantity},#{status}, #{createTime},#{updateTime})
+    </insert>
+
+    <update id="updateStatus">
+        update seckill_participant
+        set status = #{status},
+            update_time = now()
+        where id = #{id};
+    </update>
+
+    <select id="getByUserAndActivity" resultType="com.sky.entity.SeckillParticipant">
+        select *
+        from seckill_participant
+        where user_id = #{userId} and activity_id=#{activityId};
+    </select>
+    <select id="checkUserParticipated" resultType="java.lang.Integer">
+        select count(*)
+        from seckill_participant
+        where user_id = #{userId} and activity_id=#{activityId};
+    </select>
+
+
+</mapper>
