@@ -3,3 +3,45 @@
 --- Created by yin.
 --- DateTime: 2025/9/19 20:33
 ---
+
+-- 秒杀参与脚本
+--keys[1]:seckill:stock:{activityId}
+--keys[2]:seckill:participants:{activityId}
+--argv[1]:userId
+--argv[2]:quantity
+--argv[3]:perUserLimit
+
+--检查用户是否已经参与
+local isParticipated = redis.call('sismember',keys[2],argv[1])
+if isParticipated==1 then
+    return {0,'用户已经参与过秒杀'}
+end
+
+--检查库存是否已经充足
+local stock = redis.call('get',keys[1])
+if not stock then
+    return {0,'活动不存在'}
+end
+
+stock = tonumber(stock)
+local quantity = tonumber(argv[2])
+local perUserLimit = tonumber(argv[3])
+if stock<quantity then
+    return {0,'库存不足'}
+end
+if quantity>perUserLimit then
+    return {0,'超过限购数量'}
+end
+--扣减库存
+local newStock = redis.call('decrby',keys[1],quantity)
+if newStock <0 then
+    --回滚库存
+    redis.call('incrby',keys[1],quantity)
+    return {0,'库存不足'}
+end
+
+--记录用户参与
+redis.call('sadd',keys[2],argv[1])
+--设置过期时间（活动结束后清理）
+redis.call('expire',keys[2],24*60*60)
+return {1,'秒杀成功',newStock}

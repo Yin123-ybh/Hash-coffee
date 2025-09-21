@@ -16,6 +16,11 @@ public class SeckillParticipant {
      * 主键ID
      */
     private Long id;
+    /**
+     * 秒杀活动ID
+     */
+    private Long activityId;
+
 
     /**
      * 秒杀活动ID

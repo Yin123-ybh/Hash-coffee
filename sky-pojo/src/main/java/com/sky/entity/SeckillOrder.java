@@ -1,10 +1,23 @@
 package com.sky.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 秒杀订单表
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SeckillOrder implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 主键ID
      */
@@ -13,7 +26,7 @@ public class SeckillOrder implements Serializable {
     /**
      * 秒杀活动ID
      */
-    private Long seckillId;
+    private Long activityId;
 
     /**
      * 用户ID
@@ -23,7 +36,7 @@ public class SeckillOrder implements Serializable {
     /**
      * 商品ID
      */
-    private Long productId;
+    private Long dishId;
 
     /**
      * 购买数量
@@ -41,7 +54,7 @@ public class SeckillOrder implements Serializable {
     private BigDecimal totalAmount;
 
     /**
-     * 订单状态 0 待处理 1-成功 2-失败
+     * 订单状态：0-待支付，1-已支付，2-已取消
      */
     private Integer status;
 

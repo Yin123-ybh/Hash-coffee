@@ -5,6 +5,7 @@ import com.sky.dto.SeckillActivityDTO;
 import com.sky.dto.SeckillActivityPageQueryDTO;
 import com.sky.entity.SeckillActivity;
 import com.sky.vo.SeckillStatisticsVO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,4 +61,9 @@ public interface SeckillActivityService {
      * 增加已售数量
      */
     void increaseSoldCount(Long id, Integer quantity);
+
+    /**
+     * 参与秒杀活动
+     */
+    String participateSeckill(Long activityId, Long userId, Integer quantity);
 }
