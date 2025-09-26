@@ -18,6 +18,11 @@ public interface CouponMapper {
     Page<Coupon> pageQuery(CouponPageQueryDTO couponPageQueryDTO);
 
     /**
+     * 插入优惠券
+     */
+    void insert(Coupon coupon);
+    
+    /**
      * 批量插入优惠券
      */
     int insertBatch(@Param("coupons") List<Coupon> coupons);

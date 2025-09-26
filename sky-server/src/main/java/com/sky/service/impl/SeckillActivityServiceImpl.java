@@ -138,7 +138,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         return distributedLockService.executeWithLock(lockKey, 10, 10, TimeUnit.SECONDS,()->{
             // 4.执行秒杀参与
             List<Object> result = distributedLockService.seckillParticipate(activityId, userId, quantity, activity.getPerUserLimit());
-            if(result == null &&result.size()>0){
+            if(result != null && result.size() > 0){
                 Integer success = (Integer) result.get(0);
                 if(success == 1){
                     //5.记录参与记录

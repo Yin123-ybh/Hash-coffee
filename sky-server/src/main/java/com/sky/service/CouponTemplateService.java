@@ -50,4 +50,10 @@ public interface CouponTemplateService {
      * 获取所有启用的优惠券模板
      */
     List<CouponTemplate> listEnabled();
+    
+    /**
+     * 获取可领取的优惠券模板
+     * @return 可领取的优惠券模板列表
+     */
+    List<CouponTemplate> getAvailableTemplates();
 }

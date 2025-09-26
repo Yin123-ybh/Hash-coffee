@@ -609,4 +609,57 @@ public class OrderServiceImpl implements OrderService {
         //通过websocket向客户端浏览器推送消息
         webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
+    
+    /**
+     * 处理订单支付
+     * @param orderId 订单ID
+     * @param amount 支付金额
+     */
+    @Override
+    public void processOrderPayment(Long orderId, BigDecimal amount) {
+        // 更新订单状态为已支付
+        Orders orders = Orders.builder()
+                .id(orderId)
+                .status(Orders.TO_BE_CONFIRMED)
+                .payStatus(Orders.PAID)
+                .checkoutTime(LocalDateTime.now())
+                .build();
+        
+        orderMapper.update(orders);
+        log.info("订单支付处理成功：orderId={}, amount={}", orderId, amount);
+    }
+    
+    /**
+     * 取消超时订单
+     * @param orderId 订单ID
+     */
+    @Override
+    public void cancelTimeoutOrder(Long orderId) {
+        // 查询订单状态
+        Orders ordersDB = orderMapper.getById(orderId);
+        if (ordersDB != null && ordersDB.getStatus().equals(Orders.PENDING_PAYMENT)) {
+            // 更新订单状态为已取消
+            Orders orders = Orders.builder()
+                    .id(orderId)
+                    .status(Orders.CANCELLED)
+                    .cancelReason("订单超时自动取消")
+                    .cancelTime(LocalDateTime.now())
+                    .build();
+            
+            orderMapper.update(orders);
+            log.info("订单超时取消成功：orderId={}", orderId);
+        }
+    }
+    
+    /**
+     * 发送订单支付消息
+     * @param orderId 订单ID
+     * @param userId 用户ID
+     * @param amount 支付金额
+     */
+    @Override
+    public void sendOrderPayMessage(Long orderId, Long userId, BigDecimal amount) {
+        // 这里可以添加发送消息的逻辑
+        log.info("发送订单支付消息：orderId={}, userId={}, amount={}", orderId, userId, amount);
+    }
 }

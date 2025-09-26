@@ -38,4 +38,11 @@ public interface UserMapper {
      * 获取所有用户ID
      */
     List<Long> getAllUserIds();
+    
+    /**
+     * 更新用户积分
+     * @param userId 用户ID
+     * @param points 新积分
+     */
+    void updateUserPoints(Long userId, Integer points);
 }

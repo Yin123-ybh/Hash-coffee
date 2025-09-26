@@ -7,6 +7,8 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 
+import java.math.BigDecimal;
+
 public interface OrderService {
     /**
      * 用户下单
@@ -109,4 +111,25 @@ public interface OrderService {
      * @param id
      */
     void reminder(Long id);
+    
+    /**
+     * 处理订单支付
+     * @param orderId 订单ID
+     * @param amount 支付金额
+     */
+    void processOrderPayment(Long orderId, BigDecimal amount);
+    
+    /**
+     * 取消超时订单
+     * @param orderId 订单ID
+     */
+    void cancelTimeoutOrder(Long orderId);
+    
+    /**
+     * 发送订单支付消息
+     * @param orderId 订单ID
+     * @param userId 用户ID
+     * @param amount 支付金额
+     */
+    void sendOrderPayMessage(Long orderId, Long userId, BigDecimal amount);
 }

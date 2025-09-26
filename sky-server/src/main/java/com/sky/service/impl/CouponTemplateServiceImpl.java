@@ -67,4 +67,14 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     public List<CouponTemplate> listEnabled() {
         return couponTemplateMapper.listEnabled();
     }
+    
+    /**
+     * 获取可领取的优惠券模板
+     * @return 可领取的优惠券模板列表
+     */
+    @Override
+    public List<CouponTemplate> getAvailableTemplates() {
+        // 查询状态为启用且未过期的优惠券模板
+        return couponTemplateMapper.getAvailableTemplates();
+    }
 }

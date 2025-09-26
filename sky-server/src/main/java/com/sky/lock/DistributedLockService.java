@@ -1,7 +1,7 @@
 package com.sky.lock;
 
 import com.sky.constant.RedisKeyConstants;
-import jdk.internal.org.jline.utils.Log;
+
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -32,7 +32,7 @@ public class DistributedLockService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    @Value("${sky.redis.seckill.prefix:seckill:}")
+    @Value("${sky.redis.seckill.prefix}")
     private String seckillPrefix;
 
     // 锁缓存，避免重复获取锁对象

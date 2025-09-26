@@ -36,6 +36,9 @@ public class User implements Serializable {
 
     //头像
     private String avatar;
+    
+    //积分
+    private Integer points;
 
     //注册时间
     private LocalDateTime createTime;

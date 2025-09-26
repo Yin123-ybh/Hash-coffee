@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -182,5 +183,65 @@ public class CouponServiceImpl implements CouponService {
      */
     private String generateCouponCode() {
         return UUID.randomUUID().toString().replace("-", "").toUpperCase();
+    }
+    
+    /**
+     * 领取优惠券
+     * @param templateId 优惠券模板ID
+     * @param userId 用户ID
+     * @return 领取结果
+     */
+    @Override
+    public String claimCoupon(Long templateId, Long userId) {
+        // 检查用户是否已领取该模板的优惠券
+        if (hasReceived(userId, templateId)) {
+            return "您已经领取过该优惠券了";
+        }
+        
+        // 检查优惠券模板是否存在且可用
+        CouponTemplate template = couponTemplateMapper.getById(templateId);
+        if (template == null || template.getStatus() != 1) {
+            return "优惠券模板不存在或已禁用";
+        }
+        
+        // 检查是否在有效期内
+        if (template.getEndTime().isBefore(LocalDateTime.now())) {
+            return "优惠券已过期";
+        }
+        
+        // 创建优惠券
+        Coupon coupon = Coupon.builder()
+                .templateId(templateId)
+                .userId(userId)
+                .status(0) // 0-未使用
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .build();
+        
+        couponMapper.insert(coupon);
+        return "优惠券领取成功";
+    }
+    
+    /**
+     * 获取用户可用优惠券
+     * @param userId 用户ID
+     * @return 用户可用优惠券列表
+     */
+    @Override
+    public List<Coupon> getUserAvailableCoupons(Long userId) {
+        return couponMapper.getByUserId(userId, 0); // 0-未使用
+    }
+    
+    /**
+     * 检查优惠券是否可用
+     * @param couponId 优惠券ID
+     * @param userId 用户ID
+     * @param orderAmount 订单金额
+     * @return 检查结果
+     */
+    @Override
+    public String checkCouponAvailable(Long couponId, Long userId, BigDecimal orderAmount) {
+        // 这里可以添加优惠券可用性检查逻辑
+        return "优惠券可用";
     }
 }

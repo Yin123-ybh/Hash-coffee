@@ -58,6 +58,34 @@ public class UserServiceImpl implements UserService {
         //返回这个用户对象
         return user;
     }
+    
+    /**
+     * 添加用户积分
+     * @param userId 用户ID
+     * @param points 积分数量
+     * @param orderId 订单ID
+     */
+    @Override
+    public void addUserPoints(Long userId, Integer points, Long orderId) {
+        // 查询用户当前积分
+        User user = userMapper.getById(userId);
+        if (user != null) {
+            // 更新用户积分
+            userMapper.updateUserPoints(userId, user.getPoints() + points);
+            log.info("用户积分增加成功：userId={}, points={}, orderId={}", userId, points, orderId);
+        }
+    }
+    
+    /**
+     * 获取用户积分
+     * @param userId 用户ID
+     * @return 用户积分
+     */
+    @Override
+    public Integer getUserPoints(Long userId) {
+        User user = userMapper.getById(userId);
+        return user != null ? user.getPoints() : 0;
+    }
 
     /**
      * 调用微信接口服务，获取微信用户的openid
