@@ -32,6 +32,15 @@ spring:
         max-idle: 8
         min-idle: 0
 
+  # 缓存配置
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10分钟，单位毫秒
+      cache-null-values: false
+      key-prefix: "cache:"
+      use-key-prefix: true
+
   # RabbitMQ配置
   rabbitmq:
     host: ${sky.rabbitmq.host:localhost}
