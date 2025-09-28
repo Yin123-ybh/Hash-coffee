@@ -4,8 +4,9 @@ import com.github.pagehelper.Page;
 import com.sky.dto.SeckillActivityDTO;
 import com.sky.dto.SeckillActivityPageQueryDTO;
 import com.sky.entity.SeckillActivity;
+import com.sky.vo.SeckillActivityDetailVO;
+import com.sky.vo.SeckillActivityListVO;
 import com.sky.vo.SeckillStatisticsVO;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,6 +54,11 @@ public interface SeckillActivityService {
     List<SeckillActivity> getCurrentActivities();
 
     /**
+     * 获取当前进行中的秒杀活动（VO格式）
+     */
+    List<SeckillActivityListVO> getCurrentActivitiesVO();
+
+    /**
      * 扣减秒杀库存
      */
     boolean reduceStock(Long id, Integer quantity);
@@ -66,4 +72,14 @@ public interface SeckillActivityService {
      * 参与秒杀活动
      */
     String participateSeckill(Long activityId, Long userId, Integer quantity);
+
+    /**
+     * 获取秒杀活动详情（包含菜品信息）
+     */
+    SeckillActivityDetailVO getActivityDetail(Long id);
+
+    /**
+     * 获取活动商品信息
+     */
+    SeckillActivityDetailVO getActivityDish(Long dishId);
 }

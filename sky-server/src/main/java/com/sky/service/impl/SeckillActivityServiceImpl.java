@@ -13,7 +13,16 @@ import com.sky.mapper.SeckillActivityMapper;
 import com.sky.mapper.SeckillOrderMapper;
 import com.sky.mapper.SeckillParticipantMapper;
 import com.sky.mapper.SeckillStockLogMapper;
+import com.sky.service.DishService;
 import com.sky.service.SeckillActivityService;
+import com.sky.service.MessageProducerService;
+import com.sky.entity.message.SeckillStatusMessage;
+import com.sky.entity.message.SeckillStockMessage;
+import com.sky.entity.message.SeckillParticipateMessage;
+import com.sky.entity.message.SeckillEndMessage;
+import com.sky.vo.DishVO;
+import com.sky.vo.SeckillActivityDetailVO;
+import com.sky.vo.SeckillActivityListVO;
 import com.sky.vo.SeckillStatisticsVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +53,10 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     private DistributedLockService distributedLockService;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private DishService dishService;
+    @Autowired
+    private MessageProducerService messageProducerService;
 
 
     @Override
@@ -67,6 +80,19 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         //初始化redis库存
         String stockKey = RedisKeyConstants.getStockKey(seckillActivity.getId());
         redisTemplate.opsForValue().set(stockKey, seckillActivity.getStock());
+        
+        //发送秒杀活动状态变更消息
+        SeckillStatusMessage statusMessage = SeckillStatusMessage.builder()
+                .activityId(seckillActivity.getId())
+                .activityName(seckillActivity.getName())
+                .statusType(1) // 1-启用
+                .newStatus(seckillActivity.getStatus())
+                .changeTime(LocalDateTime.now())
+                .operatorId(1L) // 系统操作
+                .operatorName("系统")
+                .reason("创建秒杀活动")
+                .build();
+        messageProducerService.sendSeckillStatusMessage(statusMessage);
     }
 
     @Override
@@ -89,6 +115,23 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public void updateStatus(Long id, Integer status) {
         seckillActivityMapper.updateStatus(id, status);
+        
+        //获取活动信息
+        SeckillActivity activity = seckillActivityMapper.getById(id);
+        if (activity != null) {
+            //发送秒杀活动状态变更消息
+            SeckillStatusMessage statusMessage = SeckillStatusMessage.builder()
+                    .activityId(id)
+                    .activityName(activity.getName())
+                    .statusType(status == 1 ? 1 : 2) // 1-启用，2-禁用
+                    .newStatus(status)
+                    .changeTime(LocalDateTime.now())
+                    .operatorId(1L) // 系统操作
+                    .operatorName("系统")
+                    .reason(status == 1 ? "启用秒杀活动" : "禁用秒杀活动")
+                    .build();
+            messageProducerService.sendSeckillStatusMessage(statusMessage);
+        }
     }
 
     @Override
@@ -153,8 +196,58 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
                     seckillParticipantMapper.insert(participant);
                     //6.异步处理订单
                     processSeckillOrderAsync(activity,userId,quantity);
+                    
+                    //7.发送秒杀参与成功消息
+                    SeckillParticipateMessage participateMessage = SeckillParticipateMessage.builder()
+                            .activityId(activityId)
+                            .activityName(activity.getName())
+                            .userId(userId)
+                            .quantity(quantity)
+                            .seckillPrice(activity.getSeckillPrice())
+                            .participateTime(now)
+                            .result(1) // 1-成功
+                            .failReason(null)
+                            .orderId(null) // 订单ID稍后设置
+                            .remainingStock((Integer) result.get(2)) // 剩余库存
+                            .userIp("127.0.0.1") // 实际项目中从请求中获取
+                            .userAgent("WeChat Mini Program")
+                            .build();
+                    messageProducerService.sendSeckillParticipateMessage(participateMessage);
+                    
+                    //8.发送库存变更消息
+                    SeckillStockMessage stockMessage = SeckillStockMessage.builder()
+                            .activityId(activityId)
+                            .activityName(activity.getName())
+                            .changeType(1) // 1-扣减库存
+                            .changeQuantity(quantity)
+                            .beforeStock(activity.getStock())
+                            .afterStock((Integer) result.get(2))
+                            .changeTime(now)
+                            .userId(userId)
+                            .orderId(null) // 订单ID稍后设置
+                            .reason("用户参与秒杀")
+                            .build();
+                    messageProducerService.sendSeckillStockMessage(stockMessage);
+                    
                     return "参与成功";
                 }else {
+                    //发送秒杀参与失败消息
+                    SeckillParticipateMessage participateMessage = SeckillParticipateMessage.builder()
+                            .activityId(activityId)
+                            .activityName(activity.getName())
+                            .userId(userId)
+                            .quantity(quantity)
+                            .seckillPrice(activity.getSeckillPrice())
+                            .participateTime(now)
+                            .result(2) // 2-失败
+                            .failReason((String) result.get(1))
+                            .orderId(null)
+                            .remainingStock(activity.getStock())
+                            .userIp("127.0.0.1")
+                            .userAgent("WeChat Mini Program")
+                            .build();
+                    messageProducerService.sendSeckillParticipateMessage(participateMessage);
+                    
                     return (String) result.get(1);
                 }
             }
@@ -214,6 +307,117 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         } catch (Exception e) {
             log.error("更新数据库库存异常", e);
         }
+    }
+
+    @Override
+    public SeckillActivityDetailVO getActivityDetail(Long id) {
+        SeckillActivity activity = getById(id);
+        if (activity == null) {
+            return null;
+        }
+        
+        // 获取菜品信息
+        DishVO dishVO = dishService.getByIdWithFlavor(activity.getDishId());
+        if (dishVO == null) {
+            return null;
+        }
+        
+        // 计算剩余时间
+        LocalDateTime now = LocalDateTime.now();
+        long remainingSeconds = 0;
+        boolean isActive = false;
+        
+        if (now.isBefore(activity.getEndTime()) && now.isAfter(activity.getStartTime()) && activity.getStatus() == 1) {
+            remainingSeconds = java.time.Duration.between(now, activity.getEndTime()).getSeconds();
+            isActive = true;
+        }
+        
+        // 计算折扣率
+        BigDecimal discountRate = activity.getSeckillPrice()
+                .divide(activity.getOriginalPrice(), 2, BigDecimal.ROUND_HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+        
+        return SeckillActivityDetailVO.builder()
+                .id(activity.getId())
+                .name(activity.getName())
+                .description(activity.getDescription())
+                .dishId(activity.getDishId())
+                .dishName(dishVO.getName())
+                .dishImage(dishVO.getImage())
+                .seckillPrice(activity.getSeckillPrice())
+                .originalPrice(activity.getOriginalPrice())
+                .stock(activity.getStock())
+                .soldCount(activity.getSoldCount())
+                .perUserLimit(activity.getPerUserLimit())
+                .startTime(activity.getStartTime())
+                .endTime(activity.getEndTime())
+                .status(activity.getStatus())
+                .remainingTime(remainingSeconds)
+                .isActive(isActive)
+                .discountRate(discountRate)
+                .build();
+    }
+
+    @Override
+    public SeckillActivityDetailVO getActivityDish(Long dishId) {
+        // 查找该菜品是否有进行中的秒杀活动
+        List<SeckillActivity> activities = seckillActivityMapper.getCurrentActivities(LocalDateTime.now());
+        SeckillActivity activity = activities.stream()
+                .filter(a -> a.getDishId().equals(dishId))
+                .findFirst()
+                .orElse(null);
+        
+        if (activity == null) {
+            return null;
+        }
+        
+        return getActivityDetail(activity.getId());
+    }
+
+    @Override
+    public List<SeckillActivityListVO> getCurrentActivitiesVO() {
+        List<SeckillActivity> activities = getCurrentActivities();
+        return activities.stream().map(activity -> {
+            // 获取菜品信息
+            DishVO dishVO = dishService.getByIdWithFlavor(activity.getDishId());
+            if (dishVO == null) {
+                return null;
+            }
+            
+            // 计算剩余时间
+            LocalDateTime now = LocalDateTime.now();
+            long remainingSeconds = 0;
+            boolean isActive = false;
+            
+            if (now.isBefore(activity.getEndTime()) && now.isAfter(activity.getStartTime()) && activity.getStatus() == 1) {
+                remainingSeconds = java.time.Duration.between(now, activity.getEndTime()).getSeconds();
+                isActive = true;
+            }
+            
+            // 计算折扣率
+            BigDecimal discountRate = activity.getSeckillPrice()
+                    .divide(activity.getOriginalPrice(), 2, BigDecimal.ROUND_HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+            
+            return SeckillActivityListVO.builder()
+                    .id(activity.getId())
+                    .name(activity.getName())
+                    .dishId(activity.getDishId())
+                    .dishName(dishVO.getName())
+                    .dishImage(dishVO.getImage())
+                    .seckillPrice(activity.getSeckillPrice())
+                    .originalPrice(activity.getOriginalPrice())
+                    .stock(activity.getStock())
+                    .soldCount(activity.getSoldCount())
+                    .perUserLimit(activity.getPerUserLimit())
+                    .startTime(activity.getStartTime())
+                    .endTime(activity.getEndTime())
+                    .status(activity.getStatus())
+                    .remainingTime(remainingSeconds)
+                    .isActive(isActive)
+                    .discountRate(discountRate)
+                    .build();
+        }).filter(vo -> vo != null).collect(java.util.stream.Collectors.toList());
     }
 }
 
